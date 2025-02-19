@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Throw the Ball Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        canvas {
+            background-color: #87CEEB;
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // توپ
+        const ball = {
+            x: 100,
+            y: 300,
+            radius: 20,
+            speedX: 0,
+            speedY: 0,
+            gravity: 0.5,
+        };
+
+        // حرکت با کلیدها
+        let keys = {
+            right: false,
+            left: false,
+        };
+
+        // کنترل حرکت
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') keys.right = true;
+            if (e.key === 'ArrowLeft') keys.left = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowRight') keys.right = false;
+            if (e.key === 'ArrowLeft') keys.left = false;
+        });
+
+        // رسم توپ
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'blue';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // به‌روزرسانی موقعیت توپ
+        function updateBallPosition() {
+            if (keys.right) ball.speedX = 3;
+            else if (keys.left) ball.speedX = -3;
+            else ball.speedX = 0;
+
+            ball.speedY += ball.gravity;  // شبیه‌سازی گرانش
+            ball.x += ball.speedX;
+            ball.y += ball.speedY;
+
+            // برخورد توپ با زمین
+            if (ball.y + ball.radius > canvas.height) {
+                ball.y = canvas.height - ball.radius;
+                ball.speedY *= -0.7;  // واکنش به زمین
+            }
+
+            // برخورد توپ با دیوار
+            if (ball.x + ball.radius > canvas.width) {
+                ball.x = canvas.width - ball.radius;
+                ball.speedX *= -1;
+            } else if (ball.x - ball.radius < 0) {
+                ball.x = ball.radius;
+                ball.speedX *= -1;
+            }
+        }
+
+        // پاک کردن صفحه
+        function clear() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // حلقه بازی
+        function gameLoop() {
+            clear();
+            drawBall();
+            updateBallPosition();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>
